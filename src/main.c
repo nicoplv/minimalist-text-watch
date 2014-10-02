@@ -12,11 +12,11 @@ static TextLayer *s_minutes_layer;
 static char s_with_hours_text[24][10] = {"", "heure ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "", "heures ",
 										"heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures "};
 static char s_minutes_text[60][20] = {"pile", "une", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix", "onze", "douze", "treize", "quatorze", "et quart",
-									"seize", "dix-sept", "dix-huit", "dix-neuf", "vingt", "vingt-et-un", "vingt-deux", "vingt-trois", "vingt-quatre", "vingt-cinq", "vingt-six",
-									"vingt-sept", "vingt-huit", "vingt-neuf", "et demi", "trente-et-un", "trente-deux", "trente-trois", "trente-quatre", "trente-cinq",
-									"trente-six", "trente-sept", "trente-huit", "trente-neuf", "moins vingt", "quarente-et-un", "quarente-deux", "quarente-trois", "quarente-quatre",
-									"moins le quart", "quarente-six", "quarente-sept", "quarente-huit", "quarente-neuf", "moins dix", "cinquante-et-un", "cinquante-deux",
-									"cinquante-trois", "cinquante-quatre", "moins cinq", "cinquante-six", "cinquante-sept", "cinquante-huit", "cinquante-neuf"};
+									"seize", "dix-sept", "dix-huit", "dix-neuf", "vingt", "vingt-et-une", "vingt-deux", "vingt-trois", "vingt-quatre", "vingt-cinq", "vingt-six",
+									"vingt-sept", "vingt-huit", "vingt-neuf", "et demi", "trente-et-une", "trente-deux", "trente-trois", "trente-quatre", "trente-cinq",
+									"trente-six", "trente-sept", "trente-huit", "trente-neuf", "moins vingt", "quarente-et-une", "quarente-deux", "quarente-trois", "quarente-quatre",
+									"moins le quart", "quarente-six", "quarente-sept", "quarente-huit", "quarente-neuf", "moins dix", "moins neuf", "moins huit",
+									"moins sept", "moins six", "moins cinq", "moins quatre", "moins trois", "moins deux", "moins une"};
 static TextLayer *s_dates_layer;
 static char s_days_text[32][20] = {"", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix", "onze", "douze", "treize", "quatorze", "quinze",
 									"seize", "dix-sept", "dix-huit", "dix-neuf", "vingt", "vingt-et-une", "vingt-deux", "vingt-trois", "vingt-quatre", "vingt-cinq", "vingt-six",
@@ -106,13 +106,11 @@ static void update_time() {
 	struct tm *tick_time = localtime(&temp);
 	// Set Hours
 	int buffer_hours = tick_time->tm_hour;
-	switch(tick_time->tm_min){
-		case 40 :
-		case 45 :
-		case 50 :
-		case 55 :
-			buffer_hours++;
-		break;
+	if(tick_time->tm_min == 40 ||
+	   tick_time->tm_min == 45 ||
+	   tick_time->tm_min >= 50
+	  ){
+		buffer_hours++;
 	}
 	if(buffer_hours>23){
 		buffer_hours = 0;
