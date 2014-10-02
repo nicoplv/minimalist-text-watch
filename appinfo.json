@@ -1,0 +1,70 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "Nicoplv",
+    "longName": "Minimalist Text Watchface",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/Battery00.png",
+                "name": "BATTERY_00",
+                "type": "png"
+            },
+            {
+                "file": "images/Battery01.png",
+                "name": "BATTERY_01",
+                "type": "png"
+            },
+            {
+                "file": "images/Battery02.png",
+                "name": "BATTERY_02",
+                "type": "png"
+            },
+            {
+                "file": "images/Battery03.png",
+                "name": "BATTERY_03",
+                "type": "png"
+            },
+            {
+                "file": "images/Battery04.png",
+                "name": "BATTERY_04",
+                "type": "png"
+            },
+            {
+                "file": "images/Battery05.png",
+                "name": "BATTERY_05",
+                "type": "png"
+            },
+            {
+                "file": "images/Battery06.png",
+                "name": "BATTERY_06",
+                "type": "png"
+            },
+            {
+                "file": "fonts/Lato-Regular.ttf",
+                "name": "LATO_REGULAR_12",
+                "type": "font"
+            },
+            {
+                "file": "fonts/Lato-Regular.ttf",
+                "name": "LATO_REGULAR_18",
+                "type": "font"
+            },
+            {
+                "file": "fonts/Lato-Black.ttf",
+                "name": "LATO_BLACK_24",
+                "type": "font"
+            }
+        ]
+    },
+    "shortName": "Minimalist Text",
+    "uuid": "67533074-183c-46a3-8bed-b4573b3c0f52",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
