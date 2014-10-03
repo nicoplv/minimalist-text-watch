@@ -118,7 +118,7 @@ static void update_time() {
 	text_layer_set_text(s_hours_layer, s_hours_text[buffer_hours]);
 	// Set Minutes
 	static char buffer_minutes[32];
-	strcpy(buffer_minutes, s_with_hours_text[tick_time->tm_hour]);
+	strcpy(buffer_minutes, s_with_hours_text[buffer_hours]);
 	strcat(buffer_minutes, s_minutes_text[tick_time->tm_min]);
 	text_layer_set_text(s_minutes_layer, buffer_minutes);
 	// Set Dates
