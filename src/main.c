@@ -1,35 +1,19 @@
 #include <pebble.h>
+#include <globals.h>
 	
 static Window *s_main_window;
+
 static BitmapLayer *s_background_layer;
+static TextLayer *s_hours_layer;
+static TextLayer *s_minutes_layer;
+static TextLayer *s_dates_layer;
+static BitmapLayer *s_battery_layer;
+
 static GFont s_hours_font;
 static GFont s_minutes_font;
 static GFont s_dates_font;
-static TextLayer *s_hours_layer;
-static char s_hours_text[24][20] = {"minuit", "une", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix", "onze", "midi", "treize", "quatorze", "quinze",
-									"seize", "dix-sept", "dix-huit", "dix-neuf", "vingt", "vingt-et-une", "vingt-deux", "vingt-trois"};
-static TextLayer *s_minutes_layer;
-static char s_with_hours_text[24][10] = {"", "heure ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "", "heures ",
-										"heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures ", "heures "};
-static char s_minutes_text[60][20] = {"pile", "une", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix", "onze", "douze", "treize", "quatorze", "et quart",
-									"seize", "dix-sept", "dix-huit", "dix-neuf", "vingt", "vingt-et-une", "vingt-deux", "vingt-trois", "vingt-quatre", "vingt-cinq", "vingt-six",
-									"vingt-sept", "vingt-huit", "vingt-neuf", "et demi", "trente-et-une", "trente-deux", "trente-trois", "trente-quatre", "trente-cinq",
-									"trente-six", "trente-sept", "trente-huit", "trente-neuf", "moins vingt", "quarente-et-une", "quarente-deux", "quarente-trois", "quarente-quatre",
-									"moins le quart", "quarente-six", "quarente-sept", "quarente-huit", "quarente-neuf", "moins dix", "moins neuf", "moins huit",
-									"moins sept", "moins six", "moins cinq", "moins quatre", "moins trois", "moins deux", "moins une"};
-static TextLayer *s_dates_layer;
-static char s_days_text[32][20] = {"", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix", "onze", "douze", "treize", "quatorze", "quinze",
-									"seize", "dix-sept", "dix-huit", "dix-neuf", "vingt", "vingt-et-une", "vingt-deux", "vingt-trois", "vingt-quatre", "vingt-cinq", "vingt-six",
-									"vingt-sept", "vingt-huit", "vingt-neuf", "trente", "trente-et-un"};
-static char s_months_text[12][20] = {" janvier", " février", " mars", " avril", " mai", " juin", " juillet", " août", " septembre", " octobre", " novembre", " décembre"};
-static BitmapLayer *s_battery_layer;
-static GBitmap *s_battery_bitmap_00;
-static GBitmap *s_battery_bitmap_01;
-static GBitmap *s_battery_bitmap_02;
-static GBitmap *s_battery_bitmap_03;
-static GBitmap *s_battery_bitmap_04;
-static GBitmap *s_battery_bitmap_05;
-static GBitmap *s_battery_bitmap_06;
+
+static GBitmap *s_battery_bitmap;
 
 static void main_window_load(Window *window) {
 	// Create Background Layer
@@ -65,15 +49,9 @@ static void main_window_load(Window *window) {
 	text_layer_set_text_alignment(s_dates_layer, GTextAlignmentCenter);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_dates_layer));
 	// Create Battery Layer
-	s_battery_bitmap_00 = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_00);
-	s_battery_bitmap_01 = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_01);
-	s_battery_bitmap_02 = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_02);
-	s_battery_bitmap_03 = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_03);
-	s_battery_bitmap_04 = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_04);
-	s_battery_bitmap_05 = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_05);
-	s_battery_bitmap_06 = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_06);
+	s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_00);
 	s_battery_layer = bitmap_layer_create(GRect(59, 4, 26, 10));
-	bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap_00);
+	bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
 	layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_battery_layer));
 }
 
@@ -92,13 +70,7 @@ static void main_window_unload(Window *window) {
 	text_layer_destroy(s_dates_layer);
 	// Destroy Battery Layer and Bitmap
 	bitmap_layer_destroy(s_battery_layer);
-	gbitmap_destroy(s_battery_bitmap_00);
-	gbitmap_destroy(s_battery_bitmap_01);
-	gbitmap_destroy(s_battery_bitmap_02);
-	gbitmap_destroy(s_battery_bitmap_03);
-	gbitmap_destroy(s_battery_bitmap_04);
-	gbitmap_destroy(s_battery_bitmap_05);
-	gbitmap_destroy(s_battery_bitmap_06);
+	gbitmap_destroy(s_battery_bitmap);
 }
 
 static void update_time() {
@@ -115,16 +87,16 @@ static void update_time() {
 	if(buffer_hours>23){
 		buffer_hours = 0;
 	}
-	text_layer_set_text(s_hours_layer, s_hours_text[buffer_hours]);
+	text_layer_set_text(s_hours_layer, HOURS[buffer_hours]);
 	// Set Minutes
 	static char buffer_minutes[32];
-	strcpy(buffer_minutes, s_with_hours_text[buffer_hours]);
-	strcat(buffer_minutes, s_minutes_text[tick_time->tm_min]);
+	strcpy(buffer_minutes, WITH_HOURS[buffer_hours]);
+	strcat(buffer_minutes, MINUTES[tick_time->tm_min]);
 	text_layer_set_text(s_minutes_layer, buffer_minutes);
 	// Set Dates
 	static char buffer_dates[42];
-	strcpy(buffer_dates, s_days_text[tick_time->tm_wday]);
-	strcat(buffer_dates, s_months_text[tick_time->tm_mon]);
+	strcpy(buffer_dates, DAYS[tick_time->tm_mday-1]);
+	strcat(buffer_dates, MONTHS[tick_time->tm_mon]);
 	text_layer_set_text(s_dates_layer, buffer_dates);
 }
 
@@ -132,27 +104,29 @@ static void update_battery() {
 	// Set Battery
 	BatteryChargeState charge_state = battery_state_service_peek();
 	uint8_t charge_percent = charge_state.charge_percent;
+	gbitmap_destroy(s_battery_bitmap);
 	if(charge_percent>=87){
-		bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap_06);
+		s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_06);
 	}
 	else if(charge_percent>=74){
-		bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap_05);
+		s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_05);
 	}
 	else if(charge_percent>=61){
-		bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap_04);
+		s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_04);
 	}
 	else if(charge_percent>=48){
-		bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap_03);
+		s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_03);
 	}
 	else if(charge_percent>=35){
-		bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap_02);
+		s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_02);
 	}
 	else if(charge_percent>=22){
-		bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap_01);
+		s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_01);
 	}
 	else if(charge_percent>=9){
-		bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap_00);
+		s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_00);
 	}
+	bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
